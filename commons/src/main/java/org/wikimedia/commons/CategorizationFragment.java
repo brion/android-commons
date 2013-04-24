@@ -50,7 +50,7 @@ public class CategorizationFragment extends SherlockFragment{
 
     private ContentProviderClient client;
 
-    private final int RECENT_CATS_LIMIT = 20;
+    private final int SEARCH_CATS_LIMIT = 25;
 
     public static class CategoryItem implements Parcelable {
         public String name;
@@ -130,25 +130,11 @@ public class CategorizationFragment extends SherlockFragment{
         @Override
         protected ArrayList<String> doInBackground(Void... voids) {
             if(TextUtils.isEmpty(filter)) {
-                ArrayList<String> items = new ArrayList<String>();
-                try {
-                    Cursor cursor = client.query(
-                            CategoryContentProvider.BASE_URI,
-                            Category.Table.ALL_FIELDS,
-                            null,
-                            new String[]{},
-                            Category.Table.COLUMN_LAST_USED + " DESC");
-                    // fixme add a limit on the original query instead of falling out of the loop?
-                    while (cursor.moveToNext() && cursor.getPosition() < RECENT_CATS_LIMIT) {
-                        Category cat = Category.fromCursor(cursor);
-                        items.add(cat.getName());
-                    }
-                } catch (RemoteException e) {
-                    // faaaail
-                    throw new RuntimeException(e);
-                }
-                return items;
+                return recentCategories();
+            } else {
+                return searchRecentCategories(filter);
             }
+            /*
             if(categoriesCache.containsKey(filter)) {
                 return categoriesCache.get(filter);
             }
@@ -159,7 +145,7 @@ public class CategorizationFragment extends SherlockFragment{
                 result = api.action("query")
                         .param("list", "allcategories")
                         .param("acprefix", filter)
-                        .param("aclimit", 25)
+                        .param("aclimit", SEARCH_CATS_LIMIT)
                         .get();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -173,6 +159,7 @@ public class CategorizationFragment extends SherlockFragment{
             categoriesCache.put(filter, categories);
 
             return categories;
+            */
         }
     }
 
@@ -254,6 +241,47 @@ public class CategorizationFragment extends SherlockFragment{
         cat.setTimesUsed(0);
         return cat;
     }
+
+    private ArrayList<String> recentCategories() {
+        ArrayList<String> items = new ArrayList<String>();
+        try {
+            Cursor cursor = client.query(
+                    CategoryContentProvider.BASE_URI,
+                    Category.Table.ALL_FIELDS,
+                    null,
+                    new String[]{},
+                    Category.Table.COLUMN_LAST_USED + " DESC");
+            while (cursor.moveToNext() && cursor.getPosition() < SEARCH_CATS_LIMIT) {
+                Category cat = Category.fromCursor(cursor);
+                items.add(cat.getName());
+            }
+        } catch (RemoteException e) {
+            // faaaail
+            throw new RuntimeException(e);
+        }
+        return items;
+    }
+
+    private ArrayList<String> searchRecentCategories(String filter) {
+        ArrayList<String> items = new ArrayList<String>();
+        try {
+            Cursor cursor = client.query(
+                    CategoryContentProvider.BASE_URI,
+                    Category.Table.ALL_FIELDS,
+                    Category.Table.COLUMN_NAME + " LIKE ?",
+                    new String[]{filter + "%"},
+                    Category.Table.COLUMN_NAME + " ASC");
+            while (cursor.moveToNext() && cursor.getPosition() < SEARCH_CATS_LIMIT) {
+                Category cat = Category.fromCursor(cursor);
+                items.add(cat.getName());
+            }
+        } catch (RemoteException e) {
+            // faaaail
+            throw new RuntimeException(e);
+        }
+        return items;
+    }
+
     private void updateCategoryCount(String name) {
         Category cat = lookupCategory(name);
         cat.incTimesUsed();
