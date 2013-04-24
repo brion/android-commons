@@ -41,7 +41,8 @@ public class CategorizationFragment extends SherlockFragment{
     TextView categoriesSkip;
 
     CategoriesAdapter categoriesAdapter;
-    CategoriesUpdater lastUpdater = null;
+    CategoriesUpdater recentUpdater = null;
+    CategoriesUpdater searchUpdater = null;
     ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
     private OnCategoriesSaveHandler onCategoriesSaveHandler;
@@ -86,9 +87,9 @@ public class CategorizationFragment extends SherlockFragment{
         }
     }
 
-    private class CategoriesUpdater extends AsyncTask<Void, Void, ArrayList<String>> {
+    private abstract class CategoriesUpdater extends AsyncTask<Void, Void, ArrayList<String>> {
 
-        private String filter;
+        protected String filter;
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -126,15 +127,14 @@ public class CategorizationFragment extends SherlockFragment{
                 categoriesNotFoundView.setVisibility(View.VISIBLE);
             }
         }
+    }
 
+    private class SearchCategoriesUpdater extends CategoriesUpdater {
         @Override
         protected ArrayList<String> doInBackground(Void... voids) {
             if(TextUtils.isEmpty(filter)) {
-                return recentCategories();
-            } else {
-                return searchRecentCategories(filter);
+                return new ArrayList<String>();
             }
-            /*
             if(categoriesCache.containsKey(filter)) {
                 return categoriesCache.get(filter);
             }
@@ -159,7 +159,33 @@ public class CategorizationFragment extends SherlockFragment{
             categoriesCache.put(filter, categories);
 
             return categories;
-            */
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> categories) {
+            super.onPostExecute(categories);
+            searchUpdater = null;
+            if (recentUpdater != null) {
+                recentUpdater.cancel(true);
+                recentUpdater = null;
+            }
+        }
+    }
+
+    private class RecentCategoriesUpdater extends CategoriesUpdater {
+        @Override
+        protected ArrayList<String> doInBackground(Void... voids) {
+            if (TextUtils.isEmpty(filter)) {
+                return recentCategories();
+            } else {
+                return searchRecentCategories(filter);
+            }
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<String> categories) {
+            super.onPostExecute(categories);
+            recentUpdater = null;
         }
     }
 
@@ -336,11 +362,16 @@ public class CategorizationFragment extends SherlockFragment{
             }
 
             public void onTextChanged(CharSequence charSequence, int i, int i2, int i3) {
-                if(lastUpdater != null) {
-                    lastUpdater.cancel(true);
+                if (recentUpdater != null) {
+                    recentUpdater.cancel(true);
                 }
-                lastUpdater = new CategoriesUpdater();
-                Utils.executeAsyncTask(lastUpdater, executor);
+                if (searchUpdater != null) {
+                    searchUpdater.cancel(true);
+                }
+                recentUpdater = new RecentCategoriesUpdater(); // faster, from local DB
+                searchUpdater = new SearchCategoriesUpdater(); // slower, from the network
+                Utils.executeAsyncTask(recentUpdater, executor);
+                Utils.executeAsyncTask(searchUpdater, executor);
             }
 
             public void afterTextChanged(Editable editable) {
