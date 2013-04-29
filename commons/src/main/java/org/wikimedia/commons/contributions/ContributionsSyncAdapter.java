@@ -117,6 +117,7 @@ public class ContributionsSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
         prefs.edit().putString("lastSyncTimestamp", Utils.toMWDate(curTime)).apply();
+        Log.d("Commons", "Set lastSyncTimestamp to " + Utils.toMWDate(curTime));
         Log.d("Commons", "Oh hai, everyone! Look, a kitty!");
 
 

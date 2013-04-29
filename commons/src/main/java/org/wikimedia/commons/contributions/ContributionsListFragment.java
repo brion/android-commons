@@ -39,6 +39,7 @@ public class ContributionsListFragment extends SherlockFragment {
     private GridView contributionsList;
     private TextView waitingMessage;
     private TextView emptyMessage;
+    private SharedPreferences prefs;
 
     private ContributionsListAdapter contributionsAdapter;
 
@@ -76,9 +77,6 @@ public class ContributionsListFragment extends SherlockFragment {
 
         @Override
         public void bindView(View view, Context context, Cursor cursor) {
-            // hack: hide the 'first sync' message once we've loaded a cell
-            clearSyncMessage();
-
             final ContributionViewHolder views = (ContributionViewHolder)view.getTag();
             Contribution contribution = Contribution.fromCursor(cursor);
 
@@ -274,10 +272,19 @@ public class ContributionsListFragment extends SherlockFragment {
             contributionsList.setSelection(savedInstanceState.getInt("grid-position"));
         }
 
-        SharedPreferences prefs = this.getSherlockActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
+        prefs = this.getSherlockActivity().getSharedPreferences("prefs", Context.MODE_PRIVATE);
         String lastModified = prefs.getString("lastSyncTimestamp", "");
         if (lastModified.equals("")) {
             waitingMessage.setVisibility(View.VISIBLE);
+            prefs.registerOnSharedPreferenceChangeListener(
+                    new SharedPreferences.OnSharedPreferenceChangeListener() {
+                        public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+                            Log.d("Commons", "PREFS: " + key);
+                            if (key.equals("lastSyncTimestamp")) {
+                                clearSyncMessage();
+                            }
+                        }
+                    });
         }
     }
 
