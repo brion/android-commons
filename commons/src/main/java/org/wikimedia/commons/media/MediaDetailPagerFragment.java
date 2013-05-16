@@ -2,6 +2,7 @@ package org.wikimedia.commons.media;
 
 import android.app.DownloadManager;
 import android.content.*;
+import android.database.Cursor;
 import android.net.*;
 import android.os.*;
 import android.support.v4.app.Fragment;
@@ -172,15 +173,48 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
 
         DownloadManager.Request req = new DownloadManager.Request(imageUri);
         req.setDescription(m.getDisplayTitle());
-        req.setTitle(m.getDisplayTitle());
+        req.setTitle("Commons");
+        req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            // Modern Android updates the gallery automatically. Yay!
             req.allowScanningByMediaScanner();
+
+            // On HC/ICS/JB we can leave the download notification up when complete.
+            // This allows folks to open the file directly in gallery viewer.
             req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
         }
-        req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
 
-        DownloadManager manager = (DownloadManager)getSherlockActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-        manager.enqueue(req);
+        final DownloadManager manager = (DownloadManager)getSherlockActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+        final long downloadId = manager.enqueue(req);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            // For Gingerbread compatibility...
+            BroadcastReceiver onComplete = new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    // Check if the download has completed...
+                    Cursor c = manager.query(new DownloadManager.Query()
+                            .setFilterById(downloadId)
+                            .setFilterByStatus(DownloadManager.STATUS_SUCCESSFUL | DownloadManager.STATUS_FAILED)
+                    );
+                    if (c.moveToFirst()) {
+                        int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+                        Log.d("Commons", "Download completed with status " + status);
+                        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+                            // Force Gallery to index the new file
+                            Uri mediaUri = Uri.parse("file://" + Environment.getExternalStorageDirectory());
+                            getSherlockActivity().sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, mediaUri));
+
+                            // todo: show a persistent notification?
+                        }
+                    } else {
+                        Log.d("Commons", "Couldn't get download status for some reason");
+                    }
+                    getSherlockActivity().unregisterReceiver(this);
+                }
+            };
+            getSherlockActivity().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        }
     }
 
     @Override
