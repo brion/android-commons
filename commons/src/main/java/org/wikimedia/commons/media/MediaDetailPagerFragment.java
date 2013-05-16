@@ -160,6 +160,14 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
     private void downloadMedia(Media m) {
         String imageUrl = m.getImageUrl(),
                fileName = m.getFilename();
+        // Strip 'File:' from beginning of filename, we really shouldn't store it
+        fileName = fileName.replaceFirst("^File:", "");
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            // Gingerbread DownloadManager has no HTTPS support...
+            // Download file over HTTP, there'll be no credentials
+            // sent so it should be safe-ish.
+            imageUrl = imageUrl.replaceFirst("^https://", "http://");
+        }
         Uri imageUri = Uri.parse(imageUrl);
 
         DownloadManager.Request req = new DownloadManager.Request(imageUri);
