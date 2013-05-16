@@ -11,10 +11,10 @@
           android:icon="@android:drawable/ic_menu_view"
           android:title="@string/menu_open_in_browser"
             />
-    <item android:id="@+id/menu_open_current_image"
+    <item android:id="@+id/menu_download_current_image"
           android:showAsAction="always"
-          android:icon="@android:drawable/ic_menu_set_as"
-          android:title="Open File"
+          android:icon="@drawable/ic_menu_download"
+          android:title="Download"
           />
     <item android:id="@+id/menu_retry_current_image"
           android:showAsAction="always|withText"

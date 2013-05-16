@@ -1,5 +1,6 @@
 package org.wikimedia.commons.media;
 
+import android.app.DownloadManager;
 import android.content.*;
 import android.net.*;
 import android.os.*;
@@ -132,8 +133,8 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
                 viewIntent.setData(Uri.parse(m.getDescriptionUrl()));
                 startActivity(viewIntent);
                 return true;
-            case R.id.menu_open_current_image:
-                downloadAndOpen(m);
+            case R.id.menu_download_current_image:
+                downloadMedia(m);
                 return true;
             case R.id.menu_retry_current_image:
                 // Is this... sane? :)
@@ -150,17 +151,28 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
         }
     }
 
-    private void downloadAndOpen(Media m) {
-        String mimeType = (String)m.getTag("mimeType"),
-                imageUrl = m.getImageUrl();
+    /**
+     * Start the media file downloading to the local SD card/storage.
+     * The file can then be opened in Gallery or other apps.
+     *
+     * @param m
+     */
+    private void downloadMedia(Media m) {
+        String imageUrl = m.getImageUrl(),
+               fileName = m.getFilename();
         Uri imageUri = Uri.parse(imageUrl);
-        if (mimeType == null) mimeType = "image/jpeg"; // HACK
-        Log.d("Commons", "url " + imageUrl + " type " + mimeType);
-        Intent openIntent = new Intent();
-        openIntent.setAction(Intent.ACTION_SEND);
-        openIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-        openIntent.setType(mimeType);
-        startActivity(openIntent);
+
+        DownloadManager.Request req = new DownloadManager.Request(imageUri);
+        req.setDescription(m.getDisplayTitle());
+        req.setTitle(m.getDisplayTitle());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            req.allowScanningByMediaScanner();
+            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+        }
+        req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+        DownloadManager manager = (DownloadManager)getSherlockActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+        manager.enqueue(req);
     }
 
     @Override
