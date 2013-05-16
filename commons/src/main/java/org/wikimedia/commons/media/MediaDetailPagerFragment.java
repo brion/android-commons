@@ -133,16 +133,7 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
                 startActivity(viewIntent);
                 return true;
             case R.id.menu_open_current_image:
-                String mimeType = (String)m.getTag("mimeType"),
-                        imageUrl = m.getImageUrl();
-                Uri imageUri = Uri.parse(imageUrl);
-                if (mimeType == null) mimeType = "image/jpeg"; // HACK
-                Log.d("Commons", "url " + imageUrl + " type " + mimeType);
-                Intent openIntent = new Intent();
-                openIntent.setAction(Intent.ACTION_SEND);
-                openIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
-                openIntent.setType(mimeType);
-                startActivity(openIntent);
+                downloadAndOpen(m);
                 return true;
             case R.id.menu_retry_current_image:
                 // Is this... sane? :)
@@ -157,6 +148,19 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void downloadAndOpen(Media m) {
+        String mimeType = (String)m.getTag("mimeType"),
+                imageUrl = m.getImageUrl();
+        Uri imageUri = Uri.parse(imageUrl);
+        if (mimeType == null) mimeType = "image/jpeg"; // HACK
+        Log.d("Commons", "url " + imageUrl + " type " + mimeType);
+        Intent openIntent = new Intent();
+        openIntent.setAction(Intent.ACTION_SEND);
+        openIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+        openIntent.setType(mimeType);
+        startActivity(openIntent);
     }
 
     @Override
