@@ -25,7 +25,7 @@ public abstract class PageModifier {
         params = new JSONObject();
     }
 
-    public abstract String doModification(String pageName, String pageContents);
+    public abstract String doModification(String pageName, String pageContents, String pageXml);
 
     public abstract String getEditSumary();
 

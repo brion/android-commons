@@ -31,7 +31,7 @@ public class TemplateRemoveModifier extends PageModifier {
     }
 
     @Override
-    public String doModification(String pageName, String pageContents) {
+    public String doModification(String pageName, String pageContents, String pageXml) {
         String templateRawName = params.optString(PARAM_TEMPLATE_NAME);
         // Wikitext title normalizing rules. Spaces and _ equivalent
         // They also 'condense' - any number of them reduce to just one (just like HTML)

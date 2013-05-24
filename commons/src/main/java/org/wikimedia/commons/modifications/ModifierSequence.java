@@ -43,9 +43,9 @@ public class ModifierSequence {
         modifiers.add(modifier);
     }
 
-    public String executeModifications(String pageName, String pageContents) {
+    public String executeModifications(String pageName, String pageContents, String pageXml) {
         for(PageModifier modifier: modifiers) {
-            pageContents = modifier.doModification(pageName,  pageContents);
+            pageContents = modifier.doModification(pageName, pageContents, pageXml);
         }
         return pageContents;
     }

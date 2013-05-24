@@ -35,7 +35,7 @@ public class CategoryModifier extends PageModifier {
     }
 
     @Override
-    public String doModification(String pageName, String pageContents) {
+    public String doModification(String pageName, String pageContents, String pageXml) {
         JSONArray categories;
         categories = params.optJSONArray(PARAM_CATEGORIES);
 

@@ -97,6 +97,7 @@ public class ModificationsSyncAdapter extends AbstractThreadedSyncAdapter {
                         requestResult = api.action("query")
                                 .param("prop", "revisions")
                                 .param("rvprop", "timestamp|content")
+                                .param("rvgeneratexml", "1")
                                 .param("titles", contrib.getFilename())
                                 .get();
                     } catch (IOException e) {
@@ -106,7 +107,9 @@ public class ModificationsSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     Log.d("Commons", "Page content is " + Utils.getStringFromDOM(requestResult.getDocument()));
                     String pageContent = requestResult.getString("/api/query/pages/page/revisions/rev");
-                    String processedPageContent = sequence.executeModifications(contrib.getFilename(),  pageContent);
+                    String pageXml = requestResult.getString("/api/query/pages/page/revisions/rev/@parsetree");
+                    Log.d("Commons", "Page XML is " + pageXml);
+                    String processedPageContent = sequence.executeModifications(contrib.getFilename(), pageContent, pageXml);
 
                     try {
                         responseResult = api.action("edit")
