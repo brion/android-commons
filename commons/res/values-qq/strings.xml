@@ -77,4 +77,5 @@
   <string name="share_license_summary">Text label briefly describing CC-BY-SA license.</string>
   <string name="menu_download">Menu item text prompting user to download a selected photo or media file locally.
 {{Identical|Download}}</string>
+  <string name="menu_edit_categories">Menu item text prompting user to view/edit categories on a photo or media file.</string>
 </resources>

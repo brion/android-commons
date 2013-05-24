@@ -16,6 +16,11 @@
           android:icon="@drawable/ic_menu_download"
           android:title="@string/menu_download"
           />
+    <item android:id="@+id/menu_categories_current_image"
+          android:showAsAction="never"
+          android:icon="@android:drawable/ic_menu_agenda"
+          android:title="@string/menu_edit_categories"
+          />
     <item android:id="@+id/menu_retry_current_image"
           android:showAsAction="ifRoom|withText"
           android:icon="@android:drawable/ic_menu_revert"
