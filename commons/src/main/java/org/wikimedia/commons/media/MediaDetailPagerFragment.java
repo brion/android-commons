@@ -25,6 +25,7 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
     private ViewPager pager;
     private Boolean editable;
     private CommonsApplication app;
+    private CategorizationFragment categorizationFragment;
 
     public void onPageScrolled(int i, float v, int i2) {
         getSherlockActivity().supportInvalidateOptionsMenu();
@@ -147,6 +148,15 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
                 ((ContributionsActivity)getActivity()).deleteUpload(pager.getCurrentItem());
                 getSherlockActivity().getSupportFragmentManager().popBackStack();
                 return true;
+            case R.id.menu_categories_current_image:
+                // todo: how do we get the data inot it?
+                if(categorizationFragment == null) {
+                    categorizationFragment = new CategorizationFragment();
+                }
+                getSherlockActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.single_upload_fragment_container, categorizationFragment, "categorization")
+                        .commit();
+
             default:
                 return super.onOptionsItemSelected(item);
         }
