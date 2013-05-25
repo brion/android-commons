@@ -156,6 +156,7 @@ public class MediaDetailPagerFragment extends SherlockFragment implements ViewPa
                 getSherlockActivity().getSupportFragmentManager().beginTransaction()
                         .replace(R.id.single_upload_fragment_container, categorizationFragment, "categorization")
                         .commit();
+                return true;
 
             default:
                 return super.onOptionsItemSelected(item);

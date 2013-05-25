@@ -18,12 +18,15 @@ import org.wikimedia.commons.*;
 import org.wikimedia.commons.auth.*;
 import org.wikimedia.commons.media.*;
 
+import java.util.ArrayList;
+
 public  class       ContributionsActivity
         extends     AuthenticatedActivity
         implements  LoaderManager.LoaderCallbacks<Cursor>,
                     AdapterView.OnItemClickListener,
                     MediaDetailPagerFragment.MediaDetailProvider,
-                    FragmentManager.OnBackStackChangedListener {
+                    FragmentManager.OnBackStackChangedListener,
+                    CategorizationFragment.OnCategoriesSaveHandler {
 
 
     private Cursor allContributions;
@@ -230,5 +233,10 @@ public  class       ContributionsActivity
         } else {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
+    }
+
+    public void onCategoriesSave(ArrayList<String> categories) {
+        // todo: get item at current position? :PP
+
     }
 }
