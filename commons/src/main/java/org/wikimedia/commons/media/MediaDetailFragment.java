@@ -3,6 +3,7 @@ package org.wikimedia.commons.media;
 import android.graphics.*;
 import android.os.*;
 import android.text.*;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import com.actionbarsherlock.app.SherlockFragment;
@@ -40,6 +41,8 @@ public class MediaDetailFragment extends SherlockFragment {
     private EditText title;
     private ProgressBar loadingProgress;
     private ImageView loadingFailed;
+    private FrameLayout frameLayout;
+    private FrameLayout viewerLayout;
 
 
     @Override
@@ -67,6 +70,14 @@ public class MediaDetailFragment extends SherlockFragment {
         title = (EditText) view.findViewById(R.id.mediaDetailTitle);
         loadingProgress = (ProgressBar) view.findViewById(R.id.mediaDetailImageLoading);
         loadingFailed = (ImageView) view.findViewById(R.id.mediaDetailImageFailed);
+        viewerLayout = (FrameLayout) view.findViewById(R.id.mediaDetailViewerLayout);
+        frameLayout = (FrameLayout) view.findViewById(R.id.mediaDetailFrameLayout);
+
+        Log.d("Commons", "viewerLayout is " + viewerLayout);
+        Log.d("Commons", "container.getHeight() is " + container.getHeight());
+        Log.d("Commons", "view.getHeight() is " + view.getHeight());
+        Log.d("Commons", "frameLayout.getHeight() is " + frameLayout.getHeight());
+        viewerLayout.setMinimumHeight(640);
 
         // Enable or disable editing on the title
         title.setClickable(editable);

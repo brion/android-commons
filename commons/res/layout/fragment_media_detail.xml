@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/background_dark"
+        android:id="@+id/mediaDetailFrameLayout"
+        >
+<ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/mediaDetailScrollView">
+
+<LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+    <FrameLayout
              android:orientation="vertical"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent"
              android:background="@android:color/background_dark"
-        >
+             android:id="@+id/mediaDetailViewerLayout">
     <ProgressBar android:id="@+id/mediaDetailImageLoading"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
@@ -37,21 +55,41 @@
             android:padding="8dp"
             >
 
+        <!-- <TextView
+                 android:id="@+id/mediaDetailDescription"
+                 android:layout_width="fill_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@id/mediaDetailTitle"
+                 android:layout_alignParentBottom="true"
+                 style="?android:textAppearanceSmall"
+                 android:textColor="#FFFFFFFF"
+                 /> -->
+
         <EditText
                 android:id="@+id/mediaDetailTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:imeOptions="flagNoExtractUi"
                 android:inputType="textNoSuggestions" android:textColor="#FFFFFF"/>
-       <!-- <TextView
-                android:id="@+id/mediaDetailDescription"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/mediaDetailTitle"
-                android:layout_alignParentBottom="true"
-                style="?android:textAppearanceSmall"
-                android:textColor="#FFFFFFFF"
-                /> -->
     </RelativeLayout>
+    </FrameLayout>
 
+
+        <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:id="@+id/editText"
+                android:text="klsdjflksdjfk"/>
+
+        <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/listView"/>
+
+</LinearLayout>
+
+</ScrollView>
 </FrameLayout>
+
